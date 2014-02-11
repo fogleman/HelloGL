@@ -39,7 +39,7 @@ int main(void) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         float mat[16];
-        mat_load_identity(mat);
+        mat_identity(mat);
         mat_translate(mat, 0, -0.5, 0);
         mat_rotate(mat, 0, 0, 1, glfwGetTime());
         mat_ortho(mat, -2, 2, -2, 2, -2, 2);

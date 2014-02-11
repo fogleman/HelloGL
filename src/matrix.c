@@ -1,12 +1,12 @@
 #include <math.h>
 #include "matrix.h"
 
-void normalize(float *x, float *y, float *z) {
+void vec_normalize(float *x, float *y, float *z) {
     float d = sqrtf((*x) * (*x) + (*y) * (*y) + (*z) * (*z));
     *x /= d; *y /= d; *z /= d;
 }
 
-void mat_load_identity(float *matrix) {
+void mat_identity(float *matrix) {
     matrix[0] = 1;
     matrix[1] = 0;
     matrix[2] = 0;
@@ -47,7 +47,7 @@ void mat_translate(float *matrix, float dx, float dy, float dz) {
 }
 
 void mat_rotate(float *matrix, float x, float y, float z, float angle) {
-    normalize(&x, &y, &z);
+    vec_normalize(&x, &y, &z);
     float s = sinf(angle);
     float c = cosf(angle);
     float m = 1 - c;
@@ -117,9 +117,9 @@ void mat_apply(float *data, float *matrix, int count, int offset, int stride) {
     }
 }
 
-void frustum_planes(float planes[6][4], int radius, float *matrix) {
-    float znear = 0.125;
-    float zfar = radius * 32 + 64;
+void frustum_planes(
+    float planes[6][4], float *matrix, float znear, float zfar)
+{
     float *m = matrix;
     planes[0][0] = m[3] + m[0];
     planes[0][1] = m[7] + m[4];
@@ -151,18 +151,18 @@ void mat_frustum(
     float *matrix, float left, float right, float bottom,
     float top, float znear, float zfar)
 {
-    float temp, temp2, temp3, temp4;
-    temp = 2.0 * znear;
+    float temp1, temp2, temp3, temp4;
+    temp1 = 2.0 * znear;
     temp2 = right - left;
     temp3 = top - bottom;
     temp4 = zfar - znear;
     float mat[16];
-    mat[0] = temp / temp2;
+    mat[0] = temp1 / temp2;
     mat[1] = 0.0;
     mat[2] = 0.0;
     mat[3] = 0.0;
     mat[4] = 0.0;
-    mat[5] = temp / temp3;
+    mat[5] = temp1 / temp3;
     mat[6] = 0.0;
     mat[7] = 0.0;
     mat[8] = (right + left) / temp2;
@@ -171,7 +171,7 @@ void mat_frustum(
     mat[11] = -1.0;
     mat[12] = 0.0;
     mat[13] = 0.0;
-    mat[14] = (-temp * zfar) / temp4;
+    mat[14] = (-temp1 * zfar) / temp4;
     mat[15] = 0.0;
     mat_multiply(matrix, mat, matrix);
 }
